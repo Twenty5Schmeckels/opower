@@ -40,6 +40,11 @@ class RhodeIslandEnergy(UtilityBase):
         """Indicate that this utility uses the DSS version of the portal."""
         return False
 
+    @staticmethod
+    def uses_bill_trends_for_reads() -> bool:
+        """COA DSS uses SAML-only sessions so DataBrowser-v1 is inaccessible via Bearer token."""
+        return True
+
     async def async_login(
         self,
         session: aiohttp.ClientSession,
