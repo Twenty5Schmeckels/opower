@@ -116,3 +116,5 @@ class RhodeIslandEnergy(UtilityBase):
 
         # 6. set token to none
         token = None
+        
+        return str(token)
