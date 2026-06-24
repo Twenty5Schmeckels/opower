@@ -87,5 +87,3 @@ class RhodeIslandEnergy(UtilityBase):
             raise_for_status=True,
         ) as _:
             pass
-
-        return str(token)
