@@ -8,7 +8,7 @@ import aiohttp
 from ..const import USER_AGENT
 from ..exceptions import InvalidAuth
 from .base import UtilityBase
-
+from ..helpers import create_cookie_jar
 
 class RhodeIslandEnergy(UtilityBase):
     """Rhode Island Energy (RIEnergy).
@@ -17,6 +17,12 @@ class RhodeIslandEnergy(UtilityBase):
     Login is handled via the 'user-account-control-v1' API endpoint.
     """
 
+    def __init__(self) -> None:
+        """Initialize."""
+        super().__init__()
+        # Store cookies so we can log what is new after each request.
+        self.cookies: dict[str, list[str]] = {}
+    
     @staticmethod
     def name() -> str:
         """Return a distinct, human-readable name for this utility."""
