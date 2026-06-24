@@ -113,11 +113,3 @@ class RhodeIslandEnergy(UtilityBase):
                 result = await resp.json()
             except Exception as exc:
                 raise InvalidAuth("Unexpected response from RIEnergy login") from exc
-
-        # 6. Extract Token (Only if response was 200 JSON)
-        token = result.get("sessionToken") or result.get("accessToken")
-
-        if not token:
-            raise InvalidAuth(f"Login failed; token not found. Response keys: {list(result.keys())}")
-
-        return str(token)
