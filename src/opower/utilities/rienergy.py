@@ -113,3 +113,6 @@ class RhodeIslandEnergy(UtilityBase):
                 result = await resp.json()
             except Exception as exc:
                 raise InvalidAuth("Unexpected response from RIEnergy login") from exc
+
+        # 6. set token to none
+        token = None
