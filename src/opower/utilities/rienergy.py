@@ -142,24 +142,3 @@ class RhodeIslandEnergy(UtilityBase):
         access_token = None
     
         return access_token
-
-def _get_headers(self, customer_uuid: str | None = None) -> dict[str, str]:
-        headers = {"User-Agent": USER_AGENT}
-
-        opower_selected_entities: list[str] = []
-        if self.utility.is_dss():
-            if self.user_accounts:
-                # Required for DSS endpoints
-                opower_selected_entities.append(f"urn:session:account:{self._get_account_id()}")
-            # Required for all DSS endpoints; without this the customers endpoint returns
-            # 403 EMPTY_AUTHORIZED_CUSTOMERS_LIST (confirmed via browser HAR analysis)
-            opower_selected_entities.append("urn:session:account:provider:dsst")
-
-        # For DSS, only include the customer UUID claim when it is a true UUID (the
-        # webUserId captured at login).  A numeric CIS accountId is not accepted.
-        # Non-DSS utilities always include it (comes from the /customers response).
-        if customer_uuid and ("-" in customer_uuid or not self.utility.is_dss()):
-            opower_selected_entities.append(f"urn:opower:customer:uuid:{customer_uuid}")
-        if opower_selected_entities:
-            headers["Opower-Selected-Entities"] = json.dumps(opower_selected_entities)
-        return headers
