@@ -57,7 +57,7 @@ class RhodeIslandEnergy(UtilityBase):
         username: str,
         password: str,
         login_data: dict[str, Any],
-    ) -> str | None:
+    ) -> None:
         """Authenticate against the RIEnergy Opower portal."""
         # 1. Define URLs
         base_url = f"https://{self.subdomain()}.opower.com"
