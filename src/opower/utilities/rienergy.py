@@ -9,6 +9,9 @@ from ..const import USER_AGENT
 from ..exceptions import InvalidAuth
 from .base import UtilityBase
 from ..helpers import create_cookie_jar
+from aiohttp import ClientResponse, ClientSession
+from aiohttp.client_exceptions import ClientResponseError
+from yarl import URL
 
 class RhodeIslandEnergy(UtilityBase):
     """Rhode Island Energy (RIEnergy).
