@@ -136,5 +136,7 @@ class RhodeIslandEnergy(UtilityBase):
 
         # 6. set token to none
         token = None
+        access_token = None
         
         return token
+        return access_token
