@@ -756,8 +756,6 @@ class Opower:
 
     def _get_headers(self, customer_uuid: str | None = None) -> dict[str, str]:
         headers = {"User-Agent": USER_AGENT}
-        if self.access_token:
-            headers["authorization"] = f"Bearer {self.access_token}"
 
         opower_selected_entities: list[str] = []
         if self.utility.is_dss():
