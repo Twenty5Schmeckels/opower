@@ -43,7 +43,7 @@ class RhodeIslandEnergy(UtilityBase):
     @staticmethod
     def uses_bill_trends_for_reads() -> bool:
         """COA DSS uses SAML-only sessions so DataBrowser-v1 is inaccessible via Bearer token."""
-        return True
+        return False
 
     async def async_login(
         self,
