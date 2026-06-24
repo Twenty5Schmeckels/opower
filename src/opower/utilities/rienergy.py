@@ -3,7 +3,11 @@
 from typing import Any
 
 import aiohttp
+import logging
 
+from html.parser import HTMLParser
+from typing import Any
+from urllib.parse import parse_qs
 # --- FIX: Import the USER_AGENT constant ---
 from ..const import USER_AGENT
 from ..exceptions import InvalidAuth
@@ -12,6 +16,8 @@ from ..helpers import create_cookie_jar
 from aiohttp import ClientResponse, ClientSession
 from aiohttp.client_exceptions import ClientResponseError
 from yarl import URL
+
+_LOGGER = logging.getLogger(__file__)
 
 class RhodeIslandEnergy(UtilityBase):
     """Rhode Island Energy (RIEnergy).
@@ -53,10 +59,10 @@ class RhodeIslandEnergy(UtilityBase):
     def uses_bill_trends_for_reads() -> bool:
         """COA DSS uses SAML-only sessions so DataBrowser-v1 is inaccessible via Bearer token."""
         return False
-
+    
     async def async_login(
         self,
-        session: aiohttp.ClientSession,
+        session: ClientSession,
         username: str,
         password: str,
         login_data: dict[str, Any],
@@ -66,6 +72,7 @@ class RhodeIslandEnergy(UtilityBase):
         base_url = f"https://{self.subdomain()}.opower.com"
         login_page_url = f"{base_url}/ei/x/sign-in-wall?source=intercepted"
         api_url = f"{base_url}/ei/edge/apis/user-account-control-v1/cws/v1/{self.utilitycode()}/account/signin"
+        customer_url = f"{base_url}/ei/edge/apis/multi-account-v1/cws/{self.utilitycode()}/customers"
 
         # 2. Define Headers
         # --- FIX: Use the imported USER_AGENT constant instead of hardcoding one ---
@@ -77,6 +84,19 @@ class RhodeIslandEnergy(UtilityBase):
 
         # 3. Warm up the session
         # We just call the context manager to get the cookies
+        # If we already have a cookie, return early if it is valid.
+        if len(session.cookie_jar.filter_cookies(URL("https://rienergy.opower.com/ei"))) > 0:
+            try:
+                async with session.get(
+                    customer_url,
+                    headers=headers,
+                    raise_for_status=True,
+                ):
+                    return
+            except ClientResponseError:
+                _LOGGER.debug("Failed to login to RIEnergy with existing cookies")
+                session.cookie_jar.clear()
+                pass
         async with session.get(login_page_url, headers=headers):
             pass
 
@@ -98,7 +118,7 @@ class RhodeIslandEnergy(UtilityBase):
             api_url,
             json=payload,
             headers=login_headers,
-            raise_for_status=False,
+            raise_for_status=True,
         ) as resp:
             # --- HANDLE 204 SUCCESS ---
             if resp.status == 204:
@@ -117,4 +137,4 @@ class RhodeIslandEnergy(UtilityBase):
         # 6. set token to none
         token = None
         
-        return str(token)
+        return token
